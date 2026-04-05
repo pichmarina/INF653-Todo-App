@@ -1,0 +1,36 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App</title>
+    <link rel="stylesheet" href="/app.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-shell nav-wrap">
+        <a href="/" class="brand">TaskFlow</a>
+
+        <nav class="nav-actions">
+          {{#if isLoggedIn}}
+            <span class="nav-user">{{user.email}}</span>
+            <form
+              action="/logout"
+              method="post"
+              class="logout-form"
+              onsubmit="return confirm('Are you sure you want to logout?')"
+            >
+              <button type="submit" class="ghost-btn">Logout</button>
+            </form>
+          {{else}}
+            <a href="/login" class="ghost-link">Login</a>
+            <a href="/register" class="primary-link">Register</a>
+          {{/if}}
+        </nav>
+      </div>
+    </header>
+
+    <div class="site-shell">
+      {{{body}}}
+    </div>
+  </body>
+</html>

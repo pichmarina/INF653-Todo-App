@@ -1,0 +1,300 @@
+<main class="dashboard cute-dashboard">
+	<section class="hero-card cute-hero">
+		<div class="hero-copy">
+			<p class="eyebrow">my task garden 🌷</p>
+			<h1>Happier with a to-do list</h1>
+			<p class="hero-text">
+				Catch your tasks, sort them gently, and enjoy crossing things off one by one.
+			</p>
+			<p class="provider-pill">Using: {{activeProvider}}</p>
+
+			{{#unless isLoggedIn}}
+				<div class="hero-cta">
+					<a href="/register" class="btn-primary-link">Create account</a>
+					<a href="/login" class="btn-secondary-link">Login</a>
+				</div>
+			{{/unless}}
+		</div>
+
+		{{#if isLoggedIn}}
+			<div class="stats-grid">
+				<div class="stat-card peach">
+					<p class="stat-label">All</p>
+					<h3>{{totalTodos}}</h3>
+				</div>
+				<div class="stat-card sky">
+					<p class="stat-label">Doing</p>
+					<h3>{{activeCount}}</h3>
+				</div>
+				<div class="stat-card mint">
+					<p class="stat-label">Done</p>
+					<h3>{{completedCount}}</h3>
+				</div>
+			</div>
+		{{/if}}
+	</section>
+
+	{{#if isLoggedIn}}
+		<section class="progress-panel">
+			<div class="progress-top">
+				<div>
+					<p class="section-kicker">progress ✨</p>
+					<h2>Your little wins</h2>
+				</div>
+				<p class="progress-text">{{completedCount}} / {{totalTodos}} finished</p>
+			</div>
+
+			<div class="progress-track">
+				<div
+					class="progress-fill"
+					style="width: 0%;"
+					data-completed="{{completedCount}}"
+					data-total="{{totalTodos}}"
+					id="progressFill"
+				></div>
+			</div>
+		</section>
+	{{/if}}
+
+	{{#if errorMessage}}
+		<p class="alert alert-error">{{errorMessage}}</p>
+	{{/if}}
+
+	{{#if statusMessage}}
+		<p class="alert alert-success">{{statusMessage}}</p>
+	{{/if}}
+
+	{{#if isLoggedIn}}
+		<section class="panel-card add-panel">
+			<div class="section-head">
+				<div>
+					<p class="section-kicker">new task 🫶</p>
+					<h2>Add something to do</h2>
+				</div>
+			</div>
+
+			<form action="/todos" method="post" class="add-todo-form playful-add-form persist-scroll-form">
+				<input
+					type="text"
+					name="text"
+					placeholder="Type a new task here..."
+					required
+				/>
+				<button type="submit">Add</button>
+			</form>
+
+			<div class="sticker-row">
+				<span class="mini-sticker pink">study</span>
+				<span class="mini-sticker yellow">life</span>
+				<span class="mini-sticker blue">quick</span>
+				<span class="mini-sticker green">done later</span>
+			</div>
+		</section>
+
+		<section class="panel-card todo-board">
+			<div class="toolbar toolbar-cute">
+				<div>
+					<p class="section-kicker">your list 💌</p>
+					<h2>Things to do</h2>
+				</div>
+
+				<div class="toolbar-controls">
+					<input
+						type="text"
+						id="todoSearch"
+						class="search-input"
+						placeholder="Search your tasks..."
+					/>
+
+					<div class="filter-group">
+						<button type="button" class="filter-btn active" data-filter="all">All</button>
+						<button type="button" class="filter-btn" data-filter="active">Doing</button>
+						<button type="button" class="filter-btn" data-filter="completed">Done</button>
+					</div>
+				</div>
+			</div>
+
+			{{#if hasTodos}}
+				<div class="todo-grid cute-grid" id="todoGrid">
+					{{#each todos}}
+						<article
+							class="todo-card cute-card {{#if this.completed}}is-complete{{/if}}"
+							data-status="{{#if this.completed}}completed{{else}}active{{/if}}"
+							data-text="{{this.text}}"
+						>
+							<div class="card-deco"></div>
+
+							<div class="todo-main-row">
+								<form action="/todos/{{this._id}}/toggle?_method=PATCH" method="post" class="check-form persist-scroll-form">
+									<input type="hidden" name="_method" value="PATCH" />
+									<button
+										type="submit"
+										class="check-circle {{#if this.completed}}checked{{/if}}"
+										aria-label="Toggle task status"
+										title="Toggle task status"
+									>
+										{{#if this.completed}}✓{{/if}}
+									</button>
+								</form>
+
+								<div class="todo-content">
+									<div class="todo-meta">
+										<span class="status-chip {{#if this.completed}}chip-complete{{else}}chip-active{{/if}}">
+											{{#if this.completed}}done 🌿{{else}}doing 🌸{{/if}}
+										</span>
+
+										<span class="category-pill {{#if this.completed}}cat-green{{else}}cat-pink{{/if}}">
+											{{#if this.completed}}finished{{else}}today{{/if}}
+										</span>
+									</div>
+
+									<h3 class="todo-title">{{this.text}}</h3>
+								</div>
+
+								<button
+									type="button"
+									class="icon-toggle"
+									data-edit-toggle
+									aria-label="Open edit area"
+									title="Edit task"
+								>✏️</button>
+							</div>
+
+							<div class="todo-actions-collapsible is-hidden" data-edit-panel>
+								<form action="/todos/{{this._id}}/edit?_method=PATCH" method="post" class="edit-inline-form cute-edit-form persist-scroll-form">
+									<input type="hidden" name="_method" value="PATCH" />
+									<input
+										type="text"
+										name="text"
+										value="{{this.text}}"
+										required
+									/>
+									<button type="submit" class="small-btn">Save</button>
+								</form>
+
+								<form action="/todos/{{this._id}}?_method=DELETE" method="post" class="persist-scroll-form">
+									<input type="hidden" name="_method" value="DELETE" />
+									<button type="submit" class="danger-btn">Delete</button>
+								</form>
+							</div>
+						</article>
+					{{/each}}
+				</div>
+
+				<p id="emptyFilterState" class="empty-state hidden">
+					No tasks match this filter.
+				</p>
+			{{else}}
+				<div class="empty-box cute-empty">
+					<div class="empty-emoji">🧸</div>
+					<h3>No tasks yet</h3>
+					<p>Add your first little task above and start your list.</p>
+				</div>
+			{{/if}}
+		</section>
+
+		<script>
+			(() => {
+				const searchInput = document.getElementById("todoSearch");
+				const filterButtons = document.querySelectorAll(".filter-btn");
+				const cards = document.querySelectorAll(".todo-card");
+				const emptyState = document.getElementById("emptyFilterState");
+				const progressFill = document.getElementById("progressFill");
+
+				if (progressFill) {
+					const completed = Number(progressFill.dataset.completed || 0);
+					const total = Number(progressFill.dataset.total || 0);
+					const percent = total > 0 ? (completed / total) * 100 : 0;
+					progressFill.style.width = `${percent}%`;
+				}
+
+				const savedScrollY = sessionStorage.getItem("todoScrollY");
+				if (savedScrollY !== null) {
+					window.scrollTo(0, Number(savedScrollY));
+					sessionStorage.removeItem("todoScrollY");
+				}
+
+				document.querySelectorAll(".persist-scroll-form").forEach((form) => {
+					form.addEventListener("submit", () => {
+						sessionStorage.setItem("todoScrollY", String(window.scrollY));
+					});
+				});
+
+				let currentFilter = "all";
+
+				function applyFilters() {
+					if (!searchInput) return;
+
+					const searchValue = searchInput.value.trim().toLowerCase();
+					let visibleCount = 0;
+
+					cards.forEach((card) => {
+						const status = card.dataset.status;
+						const text = (card.dataset.text || "").toLowerCase();
+
+						const matchesSearch = text.includes(searchValue);
+						const matchesFilter = currentFilter === "all" || currentFilter === status;
+
+						const show = matchesSearch && matchesFilter;
+						card.style.display = show ? "" : "none";
+
+						if (show) visibleCount += 1;
+					});
+
+					if (emptyState) {
+						emptyState.classList.toggle("hidden", visibleCount !== 0);
+					}
+				}
+
+				if (searchInput) {
+					searchInput.addEventListener("input", applyFilters);
+				}
+
+				filterButtons.forEach((button) => {
+					button.addEventListener("click", () => {
+						filterButtons.forEach((btn) => btn.classList.remove("active"));
+						button.classList.add("active");
+						currentFilter = button.dataset.filter;
+						applyFilters();
+					});
+				});
+
+				document.querySelectorAll("[data-edit-toggle]").forEach((btn) => {
+					btn.addEventListener("click", () => {
+						const card = btn.closest(".todo-card");
+						const panel = card.querySelector("[data-edit-panel]");
+						if (!panel) return;
+
+						const isHidden = panel.classList.contains("is-hidden");
+
+						document.querySelectorAll("[data-edit-panel]").forEach((p) => {
+							if (p !== panel) {
+								p.classList.add("is-hidden");
+							}
+						});
+
+						if (isHidden) {
+							panel.classList.remove("is-hidden");
+						} else {
+							panel.classList.add("is-hidden");
+						}
+					});
+				});
+			})();
+		</script>
+	{{else}}
+	<section class="panel-card auth-promo auth-promo-alt">
+		<div class="auth-promo-visual">
+			<div class="bubble bubble-two">📝</div>
+		</div>
+
+		<div class="auth-promo-content">
+			<p class="section-kicker">save your space</p>
+			<h3>Keep your tasks private and synced to your account</h3>
+			<p>
+				Create an account to keep your list personal, organized, and ready whenever you come back.
+			</p>
+		</div>
+	</section>
+	{{/if}}
+</main>

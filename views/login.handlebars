@@ -1,0 +1,24 @@
+<main class="auth-page">
+	<section class="auth-card">
+		<p class="section-kicker">welcome back</p>
+		<h1>Login to your to-do space</h1>
+
+		{{#if message}}
+			<p class="alert alert-success">{{message}}</p>
+		{{/if}}
+
+		{{#if errorMessage}}
+			<p class="alert alert-error">{{errorMessage}}</p>
+		{{/if}}
+
+		<form action="/login" method="post" class="auth-form">
+			<input type="email" name="email" placeholder="Email address" required />
+			<input type="password" name="password" placeholder="Password" required />
+			<button type="submit">Login</button>
+		</form>
+
+		<p class="auth-switch">
+			Do not have an account yet? <a href="/register">Register</a>
+		</p>
+	</section>
+</main>
